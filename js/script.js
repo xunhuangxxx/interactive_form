@@ -57,3 +57,29 @@ activity.addEventListener('change', (e) => {
   }
   total.textContent = `Total: $${totalCost}` ;
 });
+
+/* Set default option when page loaded */
+const payment = document.querySelector('#payment');
+const creditCard = document.querySelector('.credit-card');
+const paypal = document.querySelector('.paypal');
+const bitcoin = document.querySelector('.bitcoin');
+payment.children[0].remove();
+paypal.hidden = true;
+bitcoin.hidden = true;
+
+/*Display chosen payment section when payment is selected*/
+payment.addEventListener('change', () =>{
+  if(payment.value === 'credit-card'){
+    creditCard.hidden = false;
+    paypal.hidden = true;
+    bitcoin.hidden = true;
+  }else if(payment.value === 'paypal'){
+    creditCard.hidden = true;
+    paypal.hidden = false;
+    bitcoin.hidden = true;
+  }else{
+    creditCard.hidden = true;
+    paypal.hidden = true;
+    bitcoin.hidden = false;
+  }
+});
