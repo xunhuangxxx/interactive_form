@@ -41,3 +41,19 @@ design.addEventListener('change', function(){
     }
   }
 });
+
+/* Create a function to calculate total cost */
+const total = document.getElementById('activities-cost');
+const activity = document.getElementById('activities-box');
+let totalCost = 0;
+activity.addEventListener('change', (e) => {
+//check if checkbox is checked
+  const price = e.target.parentNode.querySelector('.activity-cost').textContent;
+  const cost = parseInt(price.substring(1));
+  if(e.target.checked){
+    totalCost += cost;
+  }else{
+    totalCost -= cost;
+  }
+  total.textContent = `Total: $${totalCost}` ;
+});
