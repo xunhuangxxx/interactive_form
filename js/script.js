@@ -1,5 +1,6 @@
 /* Set focus to ture for name */
-document.getElementById('name').focus();
+const name = document.getElementById('name');
+name.focus();
 
 /* Hide the text field for job role */
 const otherJob = document.getElementById('other-job-role');
@@ -83,3 +84,68 @@ payment.addEventListener('change', () =>{
     bitcoin.hidden = false;
   }
 });
+
+/*Create funtion to check validation*/
+const submitBtn = document.querySelector('form');
+const email = document.querySelector('#email');
+//Check name
+function isNameValid() {
+  let value = name.value;
+  const nameRegex = /\S/;
+  if(nameRegex.test(value)){
+    return true;
+  }else{
+    return false;
+  }
+}
+//Check email
+function isEmailValid() {
+  let value = email.value;
+  const emailRegex = /^[\w!#$%^&*()_+=-]+@\w+(.com)$/;
+  if(emailRegex.test(value)){
+    return true;
+  }else{
+    return false;
+  }
+}
+//Check activities
+function isActivityValid() {
+  const checked = document.querySelectorAll('#activities input:checked');
+  if(checked.length === 0){
+    return false;
+  }else{
+    return true;
+  }
+}
+//Check credit card info
+function isCreditCardValid() {
+  let cardNum = document.querySelector('#cc-num').value;
+  let zip = document.querySelector('#zip').value;
+  let cvv = document.querySelector('#cvv').value;
+  const cardNumRegex = /^\d{13,16}$/;
+  const zipRegex = /^\d{5}$/;
+  const cvvRegex = /^\d{3}$/;
+
+  if(cardNumRegex.test(cardNum)
+    && zipRegex.test(zip)
+    && cvvRegex.test(cvv)){
+      return true;
+    }else{
+      return false;
+    }
+}
+
+//Add event listener to submit button
+submitBtn.addEventListener('submit', (e) => {
+  if(isNameValid() && isEmailValid() && isActivityValid()){
+    if(payment.value !== 'credit-card'){
+     console.log('submit');
+    }else if(payment.value === 'credit-card' && isCreditCardValid()){
+     console.log('submit');
+   }else{
+     e.preventDefault();
+   }
+  }else{
+    e.preventDefault();
+  }  
+})
