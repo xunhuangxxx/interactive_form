@@ -47,17 +47,41 @@ design.addEventListener('change', function(){
 const total = document.getElementById('activities-cost');
 const activity = document.getElementById('activities-box');
 let totalCost = 0;
+
 activity.addEventListener('change', (e) => {
 //check if checkbox is checked
   const price = e.target.parentNode.querySelector('.activity-cost').textContent;
   const cost = parseInt(price.substring(1));
+
   if(e.target.checked){
     totalCost += cost;
+    e.target.pa
   }else{
     totalCost -= cost;
   }
   total.textContent = `Total: $${totalCost}` ;
 });
+
+//Check conflicting activities
+
+activity.addEventListener('change',(e) => {
+  const time = e.target.nextElementSibling.nextElementSibling.textContent;
+  const checkboxes = activity.querySelectorAll('input');
+  for(let i = 1; i <checkboxes.length; i++){
+    if(e.target.checked
+       && checkboxes[i].nextElementSibling.nextElementSibling.textContent === time
+       && e.target !== checkboxes[i]) {
+        checkboxes[i].disabled = true;
+        checkboxes[i].parentElement.classList.add('disabled');
+        console.log(checkboxes[i].parentElement);
+    }else if(!e.target.checked
+       && checkboxes[i].nextElementSibling.nextElementSibling.textContent === time
+       && e.target !== checkboxes[i]) {
+        checkboxes[i].disabled = false;
+        checkboxes[i].parentElement.classList.remove('disabled');
+    }
+  }
+})
 
 /* Set default option when page loaded */
 const payment = document.querySelector('#payment');
@@ -89,20 +113,18 @@ payment.addEventListener('change', () =>{
 const submitBtn = document.querySelector('form');
 const email = document.querySelector('#email');
 //Check name
-function isNameValid() {
-  let value = name.value;
+function isNameValid(nameValue) {
   const nameRegex = /\S/;
-  if(nameRegex.test(value)){
+  if(nameRegex.test(nameValue)){
     return true;
   }else{
     return false;
   }
 }
 //Check email
-function isEmailValid() {
-  let value = email.value;
+function isEmailValid(emailValue) {
   const emailRegex = /^[\w!#$%^&*()_+=-]+@\w+(.com)$/;
-  if(emailRegex.test(value)){
+  if(emailRegex.test(emailValue)){
     return true;
   }else{
     return false;
@@ -118,34 +140,146 @@ function isActivityValid() {
   }
 }
 //Check credit card info
-function isCreditCardValid() {
-  let cardNum = document.querySelector('#cc-num').value;
-  let zip = document.querySelector('#zip').value;
-  let cvv = document.querySelector('#cvv').value;
+function isCardNumberValid(cardNum){
   const cardNumRegex = /^\d{13,16}$/;
-  const zipRegex = /^\d{5}$/;
-  const cvvRegex = /^\d{3}$/;
-
-  if(cardNumRegex.test(cardNum)
-    && zipRegex.test(zip)
-    && cvvRegex.test(cvv)){
-      return true;
-    }else{
-      return false;
-    }
+  if(cardNumRegex.test(cardNum)){
+    return true;
+  }else{
+    return false;
+  }
 }
+
+function isZipValid(zip){
+  const zipRegex = /^\d{5}$/;
+  if(zipRegex.test(zip)){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+function isCvvValid(cvv){
+  const cvvRegex = /^\d{3}$/;
+  if(cvvRegex.test(cvv)){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+const cardNum = document.querySelector('#cc-num');
+const zip = document.querySelector('#zip');
+const cvv =document.querySelector('#cvv');
+
 
 //Add event listener to submit button
 submitBtn.addEventListener('submit', (e) => {
-  if(isNameValid() && isEmailValid() && isActivityValid()){
-    if(payment.value !== 'credit-card'){
-     console.log('submit');
-    }else if(payment.value === 'credit-card' && isCreditCardValid()){
-     console.log('submit');
-   }else{
-     e.preventDefault();
-   }
-  }else{
+  const nameValidity = isNameValid(name.value);
+  const emailValidity = isEmailValid(email.value);
+  const activityValidity = isActivityValid();
+
+  if(payment.value === 'credit-card'){
+    const cardNumValidity = isCardNumberValid(cardNum.value);
+    const zipValidity = isZipValid(zip.value);
+    const cvvValidity = isCvvValid(cvv.value);
+    let errorMessage = document.querySelector('#cc-hint');
+    if(cardNumValidity){
+      hideTextError(cardNum);
+    }else{
+    // show optional error message 
+      if(cardNum.value === ''){
+        errorMessage.textContent = 'Credit card number cannot be blank';
+      }else{
+        errorMessage.textContent = 'Credit card number must be between 13 - 16 digits';
+      }
+      e.preventDefault();
+      showTextError(cardNum);
+    }
+
+    if(zipValidity){
+      hideTextError(zip);
+    }else{
+      e.preventDefault();
+      showTextError(zip);
+    }
+
+    if(cvvValidity){
+      hideTextError(cvv);
+    }else{
+      e.preventDefault();
+      showTextError(cvv);
+    }
+  }
+
+  if(nameValidity) {
+    hideTextError(name);
+  } else{
+    showTextError(name);
     e.preventDefault();
-  }  
+  }
+
+  if(emailValidity) {
+    hideTextError(email);
+  }else {
+    showTextError(email);
+    e.preventDefault();
+  }
+
+  if(activityValidity) {
+    hideActivityError();
+   }else{
+    showActivityError();
+    e.preventDefault();
+  }
 })
+
+
+/*Add event listener to focus and blur */
+const checkboxes = activity.querySelectorAll('input');
+checkboxes.forEach(checkbox => {
+  checkbox.addEventListener('focus', (e) => {
+    e.target.parentNode.className ='focus';
+  });
+  checkbox.addEventListener('blur', (e) => {
+    const blurCheckbox = e.target.parentNode.parentNode.querySelector('.focus');
+    blurCheckbox.className = '';
+  });
+});
+
+//Create functions to show error message when form is invalid
+const activitySection = document.querySelector('#activities');
+
+function showTextError(input) {
+    input.parentElement.classList.remove('valid');
+    input.parentElement.classList.add('not-valid');
+    input.parentElement.lastElementChild.style.display = 'block';
+  }
+
+function showActivityError(){
+  activitySection.classList.remove('valid');
+  activitySection.classList.add('not-valid');
+  activitySection.lastElementChild.style.display = 'block';
+}
+
+//Create functions when errors being corrected
+function hideTextError(input) {
+  input.parentElement.classList.remove('not-valid');
+  input.parentElement.classList.add('valid');
+  input.parentElement.lastElementChild.style.display = 'none';
+}
+
+function hideActivityError() {
+  activitySection.classList.remove('not-valid');
+  activitySection.classList.add('valid');
+  activitySection.lastElementChild.style.display = 'none';
+}
+
+
+/*Create a real-time error function for Email*/
+email.addEventListener('keyup', () => {
+  if(!isEmailValid(email.value)){
+    showTextError(email);
+  }else{
+    hideTextError(email);
+  }
+});
