@@ -25,19 +25,26 @@ color.disabled = true;
 
 design.addEventListener('change', function(){
   color.disabled = false;
-  const option = document.querySelectorAll('#color option');
-  for(let i = 1; i < option.length; i++){
-    if(design.value === 'js puns'){
+  const options = document.querySelectorAll('#color option');
+
+  if(design.value === 'js puns'){
+    color.value = options[1].value;
+     for(let i = 1; i < options.length; i++){
+       if(i < 4){
+
+         options[i].hidden = false;
+       }else{
+         options[i].hidden = true;
+       }
+     }
+   }
+  if(design.value === 'heart js') {
+    color.value = options[4].value;
+    for(let i = 1; i < options.length; i++){
       if(i < 4){
-        option[i].hidden = false;
+        options[i].hidden = true;
       }else{
-        option[i].hidden = true;
-      }
-    }else {
-      if(i > 3){
-        option[i].hidden = false;
-      }else{
-        option[i].hidden = true;
+        options[i].hidden = false;
       }
     }
   }
@@ -186,7 +193,7 @@ submitBtn.addEventListener('submit', (e) => {
     if(cardNumValidity){
       hideTextError(cardNum);
     }else{
-    // show optional error message 
+    // show optional error message
       if(cardNum.value === ''){
         errorMessage.textContent = 'Credit card number cannot be blank';
       }else{
